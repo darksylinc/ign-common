@@ -13,6 +13,7 @@
 #include <string>
 #include "ignition/common/Console.hh"
 #include "ignition/common/Filesystem.hh"
+#include "ignition/common/TempDirectory.hh"
 #include "ignition/common/Util.hh"
 
 #define PROJECT_BINARY_PATH "${PROJECT_BINARY_DIR}"
@@ -32,10 +33,12 @@ namespace ignition
       bool ProjectSourcePath(std::string &_sourceDir)
       {
         // Bazel builds set TEST_SRCDIR
-        if (common::env("TEST_SRCDIR", _sourceDir))
+        std::string test_srcdir, test_workspace;
+        if (common::env("TEST_SRCDIR", test_srcdir) &&
+            common::env("TEST_WORKSPACE", test_workspace))
         {
           _sourceDir = common::joinPaths(
-              _sourceDir, "__main__", "ign_common");
+              test_srcdir, test_workspace, "ign_common");
           return true;
         }
         else
@@ -53,14 +56,15 @@ namespace ignition
       bool TestTmpPath(std::string &_tmpDir)
       {
         // Bazel builds set TEST_UNDECLARED_OUTPUTS_DIR
-        if (common::env("TEST_UNDECLARED_OUTPUTS_DIR", _tmpDir))
+        if (common::env("TEST_TMPDIR", _tmpDir))
         {
           return true;
         }
         else
         {
-          _tmpDir = common::joinPaths("${PROJECT_BINARY_DIR}", "tmp");
-          return true;
+          _tmpDir = common::createTempDirectory("ignition", 
+              common::tempDirectoryPath());
+          return !_tmpDir.empty();
         }
       }
 
@@ -75,22 +79,11 @@ namespace ignition
       /// \return True if directory is set correctly, false otherwise
       bool TestSetHomePath(std::string &_homeDir)
       {
-        if (common::env("TEST_UNDECLARED_OUTPUTS_DIR", _homeDir))
+        if (TestTmpPath(_homeDir))
         {
-          return ignition::common::setenv(IGN_HOMEDIR, _homeDir);
+          return common::setenv(IGN_HOMEDIR, _homeDir);
         }
-        else
-        {
-          if (TestTmpPath(_homeDir))
-          {
-            // Set both for linux and windows
-            return ignition::common::setenv(IGN_HOMEDIR, _homeDir);
-          }
-          else
-          {
-            return false;
-          }
-        }
+        return false;
       }
 
       /// \brief Retrieve a file from the project source directory
@@ -143,16 +136,19 @@ namespace ignition
           std::string testCaseName = testInfo->test_case_name();
           this->logFilename = testCaseName + "_" + testName + ".log";
 
-          common::testing::TestSetHomePath(this->logBasePath);
+          this->temp = std::make_unique<TempDirectory>("test", "ign_common", true);
+          ASSERT_TRUE(this->temp->Valid());
+          common::setenv(IGN_HOMEDIR, this->temp->Path());
 
           // Initialize Console
-          ignLogInit(common::joinPaths(this->logBasePath, "test_logs"), 
+          ignLogInit(common::joinPaths(this->temp->Path(), "test_logs"), 
                      this->logFilename);
 
           ignition::common::Console::SetVerbosity(4);
 
           // Read the full path to the log directory.
           this->logDirectory = ignLogDirectory();
+          std::cout << "LogDirectory: " << this->logDirectory << std::endl;
         }
 
         /// \brief Get a string with the full log file path.
@@ -167,6 +163,9 @@ namespace ignition
         /// \return A string with all the log content.
         protected: std::string LogContent() const
         {
+
+          std::cerr << "Reading: " << this->FullLogPath() << std::endl;
+
           std::string loggedString;
           // Open the log file, and read back the string
           std::ifstream ifs(this->FullLogPath().c_str(), std::ios::in);
@@ -195,6 +194,8 @@ namespace ignition
 
         /// \brief String with the base path to log directory
         private: std::string logBasePath;
+
+        private: std::unique_ptr<common::TempDirectory> temp;
       };
     }  // namespace testing
   }  // namespace common

@@ -23,7 +23,9 @@
 #include <vector>
 #include <cstdio>
 
+#include "ignition/common/Console.hh"
 #include "ignition/common/Util.hh"
+#include "ignition/common/TempDirectory.hh"
 #include "ignition/common/StringUtils.hh"
 #include "ignition/common/SystemPaths.hh"
 
@@ -36,11 +38,22 @@ using namespace ignition;
 const char kPluginPath[] = "IGN_PLUGIN_PATH";
 const char kFilePath[] = "IGN_FILE_PATH";
 
+class TestTempDirectory : public ignition::common::TempDirectory
+{
+  public: TestTempDirectory():
+          ignition::common::TempDirectory("systempaths", "ign_common", true)
+  {
+  }
+};
+
 class SystemPathsFixture : public ::testing::Test
 {
   // Documentation inherited
   public: virtual void SetUp()
     {
+      this->temp = std::make_unique<TestTempDirectory>();
+      ASSERT_TRUE(this->temp->Valid());
+
       common::env(kPluginPath, this->backupPluginPath);
       common::unsetenv(kPluginPath);
 
@@ -59,6 +72,7 @@ class SystemPathsFixture : public ::testing::Test
     {
       common::setenv(kPluginPath, this->backupPluginPath);
       common::setenv(kFilePath, this->backupFilePath);
+      this->temp.reset();
     }
 
   /// \brief Backup of plugin paths to be restored after the test
@@ -69,6 +83,8 @@ class SystemPathsFixture : public ::testing::Test
 
   /// \brief Root of filesystem according to each platform
   public: std::string filesystemRoot;
+
+  protected: std::unique_ptr<TestTempDirectory> temp;
 };
 
 std::string SystemPathsJoin(const std::vector<std::string> &_paths)
