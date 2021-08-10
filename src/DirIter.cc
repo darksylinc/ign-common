@@ -55,7 +55,7 @@ DirIter::~DirIter()
 
 std::string DirIter::operator*() const
 {
-  return this->dataPtr->it->path();
+  return this->dataPtr->it->path().string();
 }
 
 const DirIter &DirIter::operator++()
