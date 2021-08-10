@@ -35,7 +35,7 @@
 namespace fs = std::filesystem;
 
 #ifndef _WIN32
-static const char preferred_separator = fs::preferred_separator;
+static const char preferred_separator = fs::path::preferred_separator;
 #else
 static const char preferred_separator = '\\';
 #endif
@@ -104,7 +104,7 @@ std::string const ignition::common::separator(std::string const &_s)
 
 /////////////////////////////////////////////////
 void ignition::common::changeFromUnixPath(std::string &_path) {
-  
+
   std::replace(_path.begin(), _path.end(), '/', preferred_separator);
 }
 

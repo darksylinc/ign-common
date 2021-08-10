@@ -57,16 +57,45 @@ namespace ignition
     /// \brief Create a temporary directory in the OS temp location.
     class IGNITION_COMMON_VISIBLE TempDirectory
     {
+      /// \brief Create a directory in the tempDirectoryPath by expanding
+      /// a name template.  This directory can also be automatically cleaned
+      /// up when the object goes out of scope.
+      ///
+      /// The TempDirectory will have the form $TMPDIR/_subdir/_prefixXXXXX/
+      ///
+      /// \param[in] _prefix String to be expanded for the template
+      /// \param[in] _subDir Subdirectory in OS $TMPDIR, if desired
+      /// \param[in] _cleanup True to indicate that the filesystem should
+      ///   be cleaned as part of the destructor
       public: TempDirectory(const std::string &_prefix = "temp_dir",
                             const std::string &_subDir = "ignition",
                             bool _cleanup = true);
 
+      /// \brief Destroy the temporary directory, removing from filesystem
+      /// if cleanup is true.
       public: ~TempDirectory();
 
+      /// \brief Indicate if the TempDirectory object is in a valid state
+      /// and that the folder exists on the filesystem
+      /// \return true if the TempDirectory is valid
       public: bool Valid() const;
 
+      /// \brief Set if the folder on disk should be cleaned.
+      ///
+      /// This is useful if you wish to clean by default during a test, but
+      /// retain the contents of the TempDirectory if the test fails.
+      /// \param[in] _cleanup True to indicate that the filesystem should
+      ///  be cleaned as part of the destructor
+      public: void Cleanup(bool _cleanup);
+
+      /// \brief Retrieve the current cleanup flag state
+      /// \return true if filesystem cleanup will occur
+      public: bool Cleanup() const;
+
+      /// \brief Retrieve the fully-expanded temporary directory path
+      /// \return the temporary directory path
       public: std::string Path() const;
-      
+
       IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       private: std::unique_ptr<TempDirectoryPrivate> dataPtr;
       IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING

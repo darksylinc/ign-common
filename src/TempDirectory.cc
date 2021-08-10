@@ -146,6 +146,7 @@ class ignition::common::TempDirectoryPrivate
   public: bool doCleanup {true};
 };
 
+/////////////////////////////////////////////////
 TempDirectory::TempDirectory(const std::string &_prefix,
                              const std::string &_subDir,
                              bool _cleanup):
@@ -169,6 +170,7 @@ TempDirectory::TempDirectory(const std::string &_prefix,
   }
 }
 
+/////////////////////////////////////////////////
 TempDirectory::~TempDirectory()
 {
   common::chdir(this->dataPtr->oldPath);
@@ -178,11 +180,25 @@ TempDirectory::~TempDirectory()
   }
 }
 
+/////////////////////////////////////////////////
 bool TempDirectory::Valid() const
 {
   return this->dataPtr->isValid;
 }
 
+/////////////////////////////////////////////////
+void TempDirectory::Cleanup(bool _cleanup)
+{
+  this->dataPtr->doCleanup = _cleanup;
+}
+
+/////////////////////////////////////////////////
+bool TempDirectory::Cleanup() const
+{
+  return this->dataPtr->doCleanup;
+}
+
+/////////////////////////////////////////////////
 std::string TempDirectory::Path() const
 {
   return this->dataPtr->path;
