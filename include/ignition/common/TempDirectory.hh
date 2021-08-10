@@ -55,7 +55,7 @@ namespace ignition
 
     /// \class TempDirectory TempDirectory.hh ignitin/common/TempDirectory.hh
     /// \brief Create a temporary directory in the OS temp location.
-    class TempDirectory
+    class IGNITION_COMMON_VISIBLE TempDirectory
     {
       public: TempDirectory(const std::string &_prefix = "temp_dir",
                             const std::string &_subDir = "ignition",
@@ -66,10 +66,11 @@ namespace ignition
       public: bool Valid() const;
 
       public: std::string Path() const;
-
+      
+      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       private: std::unique_ptr<TempDirectoryPrivate> dataPtr;
+      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
     };
-
   }  // namespace common
 }  // namespace ignition
 #endif  // IGNITION_COMMON_TEMPDIRECTORY_HH_

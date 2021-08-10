@@ -28,10 +28,14 @@
 #include <fstream>
 
 // The symlink tests should always work on UNIX systems
+#ifndef _WIN32
 #define BUILD_SYMLINK_TESTS
+#endif  // _WIN32
 
 using namespace ignition;
 using namespace common;
+
+namespace fs = std::filesystem;
 
 /////////////////////////////////////////////////
 class TestTempDirectory : public TempDirectory
@@ -60,23 +64,49 @@ bool create_new_empty_file(const std::string &_filename)
 bool create_new_file_symlink(const std::string &_symlink,
                              const std::string &_target)
 {
-  return symlink(_target.c_str(), _symlink.c_str()) == 0;
+  try
+  {
+    fs::create_symlink(_target, _symlink);
+  }
+  catch(const std::exception& e)
+  {
+    ignerr << "Failed to create link: " << e.what() << '\n';
+    return false;
+  }
+  return true;
 }
 
 /////////////////////////////////////////////////
 bool create_new_dir_symlink(const std::string &_symlink,
                             const std::string &_target)
 {
-  return symlink(_target.c_str(), _symlink.c_str()) == 0;
+  try
+  {
+    fs::create_directory_symlink(_target, _symlink);
+  }
+  catch(const std::exception& e)
+  {
+    ignerr << "Failed to create link: " << e.what() << '\n';
+    return false;
+  }
+  return true;
 }
 
 /////////////////////////////////////////////////
 bool create_new_file_hardlink(const std::string &_hardlink,
                               const std::string &_target)
 {
-  return link(_target.c_str(), _hardlink.c_str()) == 0;
+  try
+  {
+    fs::create_hard_link(_target, _hardlink);
+  }
+  catch(const std::exception& e)
+  {
+    ignerr << "Failed to create link: " << e.what() << '\n';
+    return false;
+  }
+  return true;
 }
-
 
 /// \brief Test Filesystem
 class FilesystemTest : public ::testing::Test
@@ -332,7 +362,11 @@ TEST_F(FilesystemTest, append)
   // Make sure that the slashes in the middle of string are not altered.
   // This is actually incorrect behavior
   path = joinPaths("https://fuel.ignitionrobotics.org", "/models", "box");
+#ifndef _WIN32
   EXPECT_EQ(path, "https://fuel.ignitionrobotics.org/models/box");
+#else
+  EXPECT_EQ(path, "https://fuel.ignitionrobotics.org\\models\\box");
+#endif
 }
 
 /////////////////////////////////////////////////

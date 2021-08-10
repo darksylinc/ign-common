@@ -20,6 +20,13 @@
 
 #include <filesystem>
 
+#ifdef _WIN32
+#include <windows.h>
+#include <direct.h>
+#include <fileapi.h>
+#include <io.h>
+#endif
+
 namespace fs = std::filesystem;
 
 using namespace ignition;
@@ -55,7 +62,7 @@ std::string ignition::common::tempDirectoryPath()
     ret = "";
   }
 
-  return ret;
+  return ret.string();
 }
 
 /////////////////////////////////////////////////
@@ -71,7 +78,7 @@ std::string createTempDirectory(
   fs::path templatePath = _baseName + "XXXXXX";
 
   std::string fullTemplateStr = (parentPath / templatePath).string();
-  if (!createDirectories(parentPath)) {
+  if (!createDirectories(parentPath.string())) {
     std::error_code ec{errno, std::system_category()};
     errno = 0;
     throw std::system_error(ec, "could not create the parent directory");
@@ -85,7 +92,7 @@ std::string createTempDirectory(
         "could not format the temp directory name template");
   }
   const fs::path finalPath{fullTemplateStr};
-  if (!createDirectories(finalPath)) {
+  if (!createDirectories(finalPath.string())) {
     std::error_code ec(static_cast<int>(GetLastError()),
         std::system_category());
     throw std::system_error(ec, "could not create the temp directory");
@@ -101,7 +108,7 @@ std::string createTempDirectory(
   const fs::path finalPath{dirName};
 #endif
 
-  return finalPath;
+  return finalPath.string();
 }
 
 /////////////////////////////////////////////////
