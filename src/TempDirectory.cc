@@ -81,11 +81,13 @@ std::string createTempDirectory(
   errno_t errcode = _mktemp_s(&fullTemplateStr[0], fullTemplateStr.size() + 1);
   if (errcode) {
     std::error_code ec(static_cast<int>(errcode), std::system_category());
-    throw std::system_error(ec, "could not format the temp directory name template");
+    throw std::system_error(ec,
+        "could not format the temp directory name template");
   }
   const fs::path finalPath{fullTemplateStr};
   if (!createDirectories(finalPath)) {
-    std::error_code ec(static_cast<int>(GetLastError()), std::system_category());
+    std::error_code ec(static_cast<int>(GetLastError()),
+        std::system_category());
     throw std::system_error(ec, "could not create the temp directory");
   }
 #else
@@ -93,7 +95,8 @@ std::string createTempDirectory(
   if (dirName == nullptr) {
     std::error_code ec{errno, std::system_category()};
     errno = 0;
-    throw std::system_error(ec, "could not format or create the temp directory");
+    throw std::system_error(ec,
+        "could not format or create the temp directory");
   }
   const fs::path finalPath{dirName};
 #endif
@@ -136,7 +139,7 @@ class ignition::common::TempDirectoryPrivate
   public: bool doCleanup {true};
 };
 
-TempDirectory::TempDirectory(const std::string &_prefix, 
+TempDirectory::TempDirectory(const std::string &_prefix,
                              const std::string &_subDir,
                              bool _cleanup):
   dataPtr(std::make_unique<TempDirectoryPrivate>())
@@ -151,7 +154,7 @@ TempDirectory::TempDirectory(const std::string &_prefix,
     tempPath = common::joinPaths(tempPath, _subDir);
   }
 
-  this->dataPtr->path = common::createTempDirectory(_prefix, tempPath); 
+  this->dataPtr->path = common::createTempDirectory(_prefix, tempPath);
   if (!this->dataPtr->path.empty())
   {
     this->dataPtr->isValid = true;

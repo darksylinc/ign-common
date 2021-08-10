@@ -18,17 +18,20 @@
 #ifndef IGNITION_COMMON_TEMPDIRECTORY_HH_
 #define IGNITION_COMMON_TEMPDIRECTORY_HH_
 
+#include <string>
+#include <memory>
+
 #include <ignition/common/Export.hh>
 #include <ignition/common/Filesystem.hh>
 
-namespace ignition 
+namespace ignition
 {
   namespace common
   {
     class TempDirectoryPrivate;
 
-    /// \brief Return the path to a directory suitable for temporary files. 
-    /// 
+    /// \brief Return the path to a directory suitable for temporary files.
+    ///
     /// Calls std::filesystem::temp_directory_path, refer to the standard
     /// documentation for your platform for behaviors.
     /// \return A directory suitable for temporary files.
@@ -40,7 +43,7 @@ namespace ignition
     /// On execution, will create the directory:
     ///  "_parentPath"/"_baseName" + "XXXXXX", where XXXXXX will be filled
     /// out by an OS-appropriate method (eg mkdtmp/_mktemp_s)
-    /// 
+    ///
     /// \param[in] _baseName String to be prepended to the expanded template
     /// \param[in] _parentPath Location to create the directory
     /// \param[in] _warningOp Allow or suppress filesystem warnings

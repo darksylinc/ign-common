@@ -37,7 +37,7 @@ namespace fs = std::filesystem;
 // Return true if success, false if error
 inline bool fs_warn(const std::string &_fcn,
              const std::error_code &_ec,
-             const ignition::common::FilesystemWarningOp &_warningOp = 
+             const ignition::common::FilesystemWarningOp &_warningOp =
              ignition::common::FSWO_LOG_WARNINGS)
 {
 
@@ -45,7 +45,7 @@ inline bool fs_warn(const std::string &_fcn,
   {
     if (ignition::common::FSWO_LOG_WARNINGS == _warningOp)
     {
-      ignwarn << "Failed ignition::common::" << _fcn 
+      ignwarn << "Failed ignition::common::" << _fcn
         << " (ec: " << _ec << " " << _ec.message() << ")\n";
     }
     return false;
@@ -83,7 +83,7 @@ bool ignition::common::createDirectory(const std::string &_path)
 bool ignition::common::createDirectories(const std::string &_path)
 {
   std::error_code ec;
-  // Disregard return here because it may return false if the 
+  // Disregard return here because it may return false if the
   // directory is not actually created (already exists)
   fs::create_directories(_path, ec);
   return fs_warn("createDirectories", ec);
@@ -129,7 +129,8 @@ std::string ignition::common::absPath(const std::string &_path)
 }
 
 /////////////////////////////////////////////////
-std::string ignition::common::joinPaths(const std::string &_path1, const std::string &_path2)
+std::string ignition::common::joinPaths(
+    const std::string &_path1, const std::string &_path2)
 {
   fs::path p1{_path1};
   fs::path p2{_path2};
@@ -156,7 +157,7 @@ std::string ignition::common::joinPaths(const std::string &_path1, const std::st
   if (!is_url)
     ret = ret.lexically_normal();
 
-  return ret; 
+  return ret;
 }
 
 /////////////////////////////////////////////////
@@ -219,7 +220,7 @@ bool ignition::common::copyDirectory(
     const std::string &_newDirname,
     const FilesystemWarningOp _warningOp)
 {
-  const auto copyOptions = fs::copy_options::recursive 
+  const auto copyOptions = fs::copy_options::recursive
                          | fs::copy_options::overwrite_existing;
 
   // std::filesystem won't create intermediate directories
@@ -303,7 +304,7 @@ bool ignition::common::removeAll(
 
 /////////////////////////////////////////////////
 std::string ignition::common::uniqueFilePath(
-    const std::string &_pathAndName, 
+    const std::string &_pathAndName,
     const std::string &_extension)
 {
   std::string result = _pathAndName + "." + _extension;

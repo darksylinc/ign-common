@@ -94,7 +94,7 @@ class FilesystemTest : public ::testing::Test
     this->temp.reset();
   }
 
-  protected: std::unique_ptr<TestTempDirectory> temp; 
+  protected: std::unique_ptr<TestTempDirectory> temp;
 };
 
 /////////////////////////////////////////////////
@@ -148,7 +148,7 @@ TEST_F(FilesystemTest, fileOps)
 
   // Suppress warnings on the next two, as they are expected to warn when
   // trying to copy from/to the same file
-  EXPECT_FALSE(common::copyFile("test3.tmp", "test3.tmp", 
+  EXPECT_FALSE(common::copyFile("test3.tmp", "test3.tmp",
         common::FSWO_SUPPRESS_WARNINGS));
   EXPECT_FALSE(common::copyFile("test3.tmp", "./test3.tmp",
         common::FSWO_SUPPRESS_WARNINGS));

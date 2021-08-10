@@ -42,7 +42,7 @@ DirIter::DirIter(const std::string &_in):
 {
   try {
     this->dataPtr->it = fs::directory_iterator(_in);
-  } 
+  }
   catch (const fs::filesystem_error &ex)
   {
   }
