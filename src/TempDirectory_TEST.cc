@@ -66,16 +66,6 @@ TEST(TempDirectory, createTempDirectory_emptybase)
 }
 
 /////////////////////////////////////////////////
-TEST(TempDirectory,
-    IGN_UTILS_TEST_DISABLED_ON_WIN32(createTempDirectory_noperms))
-{
-  // Try to create somewhere we don't have permissions
-  // This test may fail running as root
-  auto tmp = ignition::common::createTempDirectory("", "/opt");
-  ASSERT_TRUE(tmp.empty());
-}
-
-/////////////////////////////////////////////////
 TEST(TempDirectory, TempDirectory)
 {
   std::string path;

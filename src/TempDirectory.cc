@@ -163,6 +163,7 @@ TempDirectory::TempDirectory(const std::string &_prefix,
   }
 
   this->dataPtr->path = common::createTempDirectory(_prefix, tempPath);
+  std::cerr << "Created temporary directory: " << this->dataPtr->path << std::endl; 
   if (!this->dataPtr->path.empty())
   {
     this->dataPtr->isValid = true;
